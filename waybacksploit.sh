@@ -33,7 +33,7 @@ mkdir -p ${target_dir}
 mkdir -p ${exploits_dir}
 rm ${urls_file} 2>/dev/null
 rm ${urls_file}.tmp 2>/dev/null
-waybackurls ${target_host} | grep "\.js" | uniq | sort >>${urls_file}.tmp
+waybackurls ${target_host} | grep -Ei '*.js|*.css|*.txt' | uniq | sort >>${urls_file}.tmp
 
 if [ -z "$(cat ${urls_file}.tmp)" ]; then
   echo "no urls found in waybackmachine for ${target_host}"
@@ -59,9 +59,12 @@ rm ${urls_file}.tmp
 # fi
 
 cd ${target_dir}
+echo Downloading website files
 cat ${urls_file} | xargs wget 2>/dev/null
 cd ${workdir}
-if [ -z $(which searchsploit) ]; then
+echo Detecting vulnerabilities
+if [ -z "$(which searchsploit)" ]; then
+  # if not using searchsploit just display findings and exit
   retire --path ${target_dir} --severity ${severity} --colors
   exit 0
 fi
