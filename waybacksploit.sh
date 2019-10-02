@@ -29,24 +29,24 @@ if [ -z ${target_host} ]; then
   exit 1
 fi
 
-# mkdir -p ${target_dir}
-# mkdir -p ${exploits_dir}
-# rm ${urls_file} 2>/dev/null
-# rm ${urls_file}.tmp 2>/dev/null
-# waybackurls ${target_host} | grep -Ei '*.js|*.css|*.txt' | uniq | sort >>${urls_file}.tmp
+mkdir -p ${target_dir}
+mkdir -p ${exploits_dir}
+rm ${urls_file} 2>/dev/null
+rm ${urls_file}.tmp 2>/dev/null
+waybackurls ${target_host} | grep -Ei '*.js|*.css|*.txt' | uniq | sort >>${urls_file}.tmp
 
-# if [ -z "$(cat ${urls_file}.tmp)" ]; then
-#   echo "no urls found in waybackmachine for ${target_host}"
-#   exit 0
-# fi
+if [ -z "$(cat ${urls_file}.tmp)" ]; then
+  echo "no urls found in waybackmachine for ${target_host}"
+  exit 0
+fi
 
 # use the output to get only urls with Status:200
-# cat ${urls_file}.tmp | \
-#   parallel -j50 -q curl -X HEAD -Lw 'Status:%{http_code}\t Size:%{size_download}\t %{url_effective}\n' -o /dev/null -sk | \
-#   grep 'Status:200' | \
-#   egrep -o 'https?://[^ ]+' >>${urls_file}
+cat ${urls_file}.tmp | \
+  parallel -j50 -q curl -X HEAD -Lw 'Status:%{http_code}\t Size:%{size_download}\t %{url_effective}\n' -o /dev/null -sk | \
+  grep 'Status:200' | \
+  egrep -o 'https?://[^ ]+' >>${urls_file}
 
-# rm ${urls_file}.tmp
+rm ${urls_file}.tmp
 
 # TODO get list of redirects from tmp_${urls_file} and try https, add to ${urls_file}
 # if [ "$rewrite_to_https" = "true" ]; then
